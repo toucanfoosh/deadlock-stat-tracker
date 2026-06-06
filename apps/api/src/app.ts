@@ -7,6 +7,18 @@ import { refreshRoutes } from "./routes/refresh.routes.js";
 import { statsRoutes } from "./routes/stats.routes.js";
 import { registerRefreshScheduler } from "./services/refresh.service.js";
 
+function corsOrigins(): string | string[] {
+  const raw = process.env.ORIGIN?.trim();
+  if (!raw) return "http://localhost:5173";
+
+  const origins = raw
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  return origins.length === 1 ? origins[0]! : origins;
+}
+
 export function buildApp() {
   const app = Fastify({
     logger: {
@@ -18,7 +30,7 @@ export function buildApp() {
   });
 
   app.register(cors, {
-    origin: process.env.ORIGIN ?? "http://localhost:5173",
+    origin: corsOrigins(),
   });
 
   app.register(multipart, {
