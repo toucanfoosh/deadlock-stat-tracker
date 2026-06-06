@@ -1,6 +1,7 @@
-import type {
-  MatchMetadataResponse,
-  PlayerMatchHistoryEntry,
+import {
+  steamId64FromProfile,
+  type MatchMetadataResponse,
+  type PlayerMatchHistoryEntry,
 } from "@deadlock/shared";
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
@@ -42,7 +43,9 @@ export async function registerProfile(
     personaName =
       personaName ?? (playerProfile?.personaname as string | undefined);
     avatarUrl = avatarUrl ?? (playerProfile?.avatarfull as string | undefined);
-    steamId64 = steamId64 ?? (playerProfile?.steam_id as string | undefined);
+    steamId64 =
+      steamId64 ??
+      (playerProfile ? (steamId64FromProfile(playerProfile) ?? undefined) : undefined);
   }
 
   const player = await prisma.player.upsert({

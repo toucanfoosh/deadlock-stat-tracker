@@ -1,3 +1,4 @@
+import { steamId64FromProfile } from "@deadlock/shared";
 import type { FastifyPluginAsync } from "fastify";
 import { z } from "zod";
 import { deadlockClient } from "../services/deadlock-client.js";
@@ -46,8 +47,7 @@ export const statsRoutes: FastifyPluginAsync = async (app) => {
           accountId: directByAccount[0].account_id,
           personaName: directByAccount[0].personaname ?? null,
           avatarUrl: directByAccount[0].avatarfull ?? null,
-          steamId64:
-            (directByAccount[0].steam_id as string | undefined) ?? null,
+          steamId64: steamId64FromProfile(directByAccount[0]),
           source: "accountId",
         });
       }
@@ -62,12 +62,14 @@ export const statsRoutes: FastifyPluginAsync = async (app) => {
         accountId: direct[0].account_id,
         personaName: direct[0].personaname ?? null,
         avatarUrl: direct[0].avatarfull ?? null,
-        steamId64: (direct[0].steam_id as string | undefined) ?? null,
+        steamId64: steamId64FromProfile(direct[0]),
         source: "steamId",
       });
     }
 
-    const search = await deadlockClient.searchSteamProfile(q).catch(() => []);
+    const search = await deadlockClient
+      .searchSteamProfile(q, limit)
+      .catch(() => []);
     for (const entry of search) {
       if (results.length >= limit) {
         break;
@@ -80,7 +82,7 @@ export const statsRoutes: FastifyPluginAsync = async (app) => {
         accountId: entry.account_id,
         personaName: entry.personaname ?? null,
         avatarUrl: entry.avatarfull ?? null,
-        steamId64: null,
+        steamId64: steamId64FromProfile(entry),
         source: "steamSearch",
       });
     }
@@ -144,7 +146,7 @@ export const statsRoutes: FastifyPluginAsync = async (app) => {
             accountId: direct[0].account_id,
             personaName: direct[0].personaname ?? undefined,
             avatarUrl: direct[0].avatarfull ?? undefined,
-            steamId64: (direct[0].steam_id as string | undefined) ?? undefined,
+            steamId64: steamId64FromProfile(direct[0]) ?? undefined,
             enrichFromSteam: true,
           })
         ).accountId,
@@ -154,7 +156,7 @@ export const statsRoutes: FastifyPluginAsync = async (app) => {
       });
     }
 
-    const search = await deadlockClient.searchSteamProfile(q).catch(() => []);
+    const search = await deadlockClient.searchSteamProfile(q, 1).catch(() => []);
     if (search.length === 0) {
       return reply.code(404).send({ error: "No profile found" });
     }
@@ -165,6 +167,7 @@ export const statsRoutes: FastifyPluginAsync = async (app) => {
           accountId: search[0].account_id,
           personaName: search[0].personaname ?? undefined,
           avatarUrl: search[0].avatarfull ?? undefined,
+          steamId64: steamId64FromProfile(search[0]) ?? undefined,
           enrichFromSteam: true,
         })
       ).accountId,

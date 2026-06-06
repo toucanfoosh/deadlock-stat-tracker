@@ -107,12 +107,26 @@ export class DeadlockApiClient {
   }
 
   async getSteamProfile(query: { account_id?: number; steam_id?: string }) {
-    return this.request<SteamProfile[]>("/v1/players/steam", query);
+    if (query.account_id !== undefined) {
+      const profile = await this.request<SteamProfile>(
+        `/v1/players/${query.account_id}/steam`,
+      );
+      return [profile];
+    }
+
+    if (query.steam_id) {
+      return this.request<SteamProfile[]>("/v1/players/steam", {
+        account_ids: query.steam_id,
+      });
+    }
+
+    return [];
   }
 
-  async searchSteamProfile(search: string) {
+  async searchSteamProfile(search: string, limit = 25) {
     return this.request<SteamSearchEntry[]>("/v1/players/steam-search", {
-      q: search,
+      search_query: search,
+      limit,
     });
   }
 

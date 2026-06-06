@@ -117,6 +117,7 @@ export interface SteamProfile {
   steam_id?: string;
   personaname?: string;
   avatarfull?: string;
+  profileurl?: string;
   [key: string]: unknown;
 }
 
@@ -124,6 +125,7 @@ export interface SteamSearchEntry {
   account_id: number;
   personaname?: string;
   avatarfull?: string;
+  profileurl?: string;
   [key: string]: unknown;
 }
 
