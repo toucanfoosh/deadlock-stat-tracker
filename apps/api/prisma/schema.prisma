@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AssetType {
+  HERO
+  ITEM
+  RANK
+}
+
+model Player {
+  accountId       Int      @id
+  steamId64       String?
+  personaName     String?
+  avatarUrl       String?
+  mmrHistory      Json?
+  trackerRating   Float?
+  trackerUpdatedAt DateTime?
+  lastRefreshedAt DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  matches    MatchPlayer[]
+  aggregates PlayerAggregate[]
+}
+
+model Patch {
+  patchId     String    @id
+  title       String
+  releasedAt  DateTime
+  endedAt     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  matchBucket Match[]
+}
+
+model Match {
+  matchId      BigInt   @id
+  startTime    DateTime
+  patchId      String?
+  gameMode     Int?
+  matchMode    Int?
+  durationSec  Int?
+  rawMetadata  Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  players MatchPlayer[]
+  patch   Patch? @relation(fields: [patchId], references: [patchId], onDelete: SetNull)
+
+  @@index([startTime])
+  @@index([patchId])
+}
+
+model MatchPlayer {
+  id              String   @id @default(cuid())
+  matchId         BigInt
+  accountId       Int
+  heroId          Int?
+  heroLevel       Int?
+  playerTeam      Int?
+  kills           Int?
+  deaths          Int?
+  assists         Int?
+  lastHits        Int?
+  denies          Int?
+  netWorth        Int?
+  soulsPerMinute  Float?
+  damageDealt     Int?
+  damageTaken     Int?
+  objectiveDamage Int?
+  bossDamage      Int?
+  healingDone     Int?
+  win             Boolean?
+  rankTier        String?
+  rankDivision    Int?
+  rankSubrank     Int?
+  queueCategory   String?
+  queueWeight     Float?
+  trackerBefore   Float?
+  trackerDelta    Float?
+  trackerAfter    Float?
+  progressionCurve Json?
+  itemBuild       Json?
+  abilityBuild    Json?
+  extraMetrics    Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  match  Match  @relation(fields: [matchId], references: [matchId], onDelete: Cascade)
+  player Player @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
+
+  @@unique([matchId, accountId])
+  @@index([accountId, heroId])
+  @@index([heroId])
+}
+
+model PlayerAggregate {
+  id                 String   @id @default(cuid())
+  accountId          Int
+  filterHash         String
+  totalMatches       Int
+  wins               Int
+  winRate            Float
+  avgKda             Float
+  avgNetWorth        Float
+  avgCs              Float
+  recentForm         Json?
+  perHero            Json?
+  mmrHistory         Json?
+  mateEnemy          Json?
+  progressionSummary Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  player Player @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
+
+  @@unique([accountId, filterHash])
+}
+
+model Asset {
+  id        String    @id @default(cuid())
+  type      AssetType
+  assetId   Int
+  name      String
+  iconUrl   String?
+  payload   Json?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([type, assetId])
+}
+
+model GlobalStatsCache {
+  key       String   @id
+  payload   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

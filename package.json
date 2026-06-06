@@ -1,0 +1,24 @@
+{
+  "name": "deadlock-stat-tracker",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.5.2",
+  "scripts": {
+    "dev": "corepack pnpm -r --parallel dev",
+    "build": "corepack pnpm -r build",
+    "lint": "corepack pnpm -r lint",
+    "typecheck": "corepack pnpm -r typecheck",
+    "test": "corepack pnpm -r test",
+    "format": "corepack pnpm -r format"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vitest": "^3.2.4"
+  }
+}

@@ -1,0 +1,32 @@
+# dependencies
+node_modules
+
+# build outputs
+dist
+dist-ssr
+*.tsbuildinfo
+.turbo
+
+# environment / secrets
+.env
+.env.*
+!.env.example
+apps/api/.env
+apps/web/.env
+
+# local databases
+apps/api/prisma/dev.db
+apps/api/prisma/dev.db-journal
+
+# logs / coverage
+*.log
+coverage
+
+# local tooling
+.mcp.json
+
+# OS / editor
+.DS_Store
+.idea
+.vscode/*
+!.vscode/extensions.json
