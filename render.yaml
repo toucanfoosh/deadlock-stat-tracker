@@ -3,6 +3,7 @@ services:
     name: deadlock-stat-tracker-api
     runtime: docker
     dockerfilePath: apps/api/Dockerfile
+    dockerContext: .
     envVars:
       - key: NODE_ENV
         value: production
